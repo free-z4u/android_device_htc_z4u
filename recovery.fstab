@@ -27,13 +27,13 @@
 # Without  SD Card Slot : /sdcard  vfat  /dev/block/sda1       /dev/block/sda
 # With     SD Card Slot : /sdcard  vfat  /dev/block/mmcblk1p1  /dev/block/mmcblk1
 
-# mount point	fstype		device			[device2]
-
-/boot		emmc		boot
-/cache		ext4		cache
-/data		ext4		userdata
-/misc		emmc		misc
-/recovery	emmc		recovery
-/sdcard		vfat		/dev/block/mmcblk1p1	/dev/block/mmcblk1
-/system		ext4		system
-/devlog		ext4		devlog
+# mount point   fstype      device          [device2]
+# from /proc/emmc
+/boot       emmc        /dev/block/mmcblk0p32
+/cache      ext4        /dev/block/mmcblk0p37
+/data       ext4        /dev/block/mmcblk0p39
+/misc       emmc        /dev/block/mmcblk0p17
+/recovery   emmc        /dev/block/mmcblk0p33
+/sdcard     vfat        /dev/block/mmcblk1p1    /dev/block/mmcblk1
+/system     ext4        /dev/block/mmcblk0p38
+/devlog     ext4        /dev/block/mmcblk0p35
