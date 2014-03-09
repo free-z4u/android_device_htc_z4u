@@ -7,18 +7,9 @@ $(call inherit-product-if-exists, vendor/htc/z4u/z4u-vendor.mk)
 
 DEVICE_PACKAGE_OVERLAYS += device/htc/z4u/overlay
 
-#LOCAL_PATH := device/htc/z4u
-#ifeq ($(TARGET_PREBUILT_KERNEL),)
-#	LOCAL_KERNEL := $(LOCAL_PATH)/kernel
-#else
-#	LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
-#endif
-
-#PRODUCT_COPY_FILES += \
-#    $(LOCAL_KERNEL):kernel
-
 TARGET_KERNEL_SOURCE := kernel/htc/z4u
 TARGET_KERNEL_CONFIG := z4u_defconfig
+TARGET_KERNEL_RECOVERY_CONFIG := z4u_defconfig
 
 $(call inherit-product, build/target/product/full.mk)
 
