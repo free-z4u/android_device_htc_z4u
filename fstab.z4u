@@ -11,5 +11,4 @@
 /dev/block/mmcblk0p17                  /misc             emmc    defaults                                defaults
 /dev/block/mmcblk0p35                  /devlog           ext4    defaults                                defaults
 
-/dev/block/mmcblk1p1                   auto              vfat    defaults                                voldmanaged=sdcard0:auto,noemulatedsd
-/dev/block/mmcblk1                     auto              vfat    defaults                                voldmanaged=sdcard1:auto,noemulatedsd
+/dev/block/mmcblk1p1                   /storage/sdcard0  vfat    defaults                                defaults
