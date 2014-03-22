@@ -1,5 +1,8 @@
 USE_CAMERA_STUB := true
 
+# Dalvik
+TARGET_ARCH_LOWMEM := true
+
 # inherit from the proprietary version
 -include vendor/htc/z4u/BoardConfigVendor.mk
 
@@ -10,6 +13,8 @@ TARGET_BOARD_PLATFORM := msm8225q
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
 TARGET_ARCH_VARIANT := armv7-a-neon
+TARGET_CPU_VARIANT := cortex-a5
+TARGET_CPU_SMP := true
 ARCH_ARM_HAVE_TLS_REGISTER := true
 
 TARGET_BOOTLOADER_BOARD_NAME := z4u
