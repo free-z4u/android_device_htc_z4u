@@ -1,0 +1,50 @@
+on emmc-fs
+
+    mkdir /system
+    mkdir /data 0771 system system
+    mkdir /cache 0770 system cache
+    mkdir /devlog 0700 root root
+
+on boot
+# HTC_WIFI_START
+    insmod /system/lib/modules/cfg80211.ko
+# HTC_WIFI_END
+
+#
+#  Create a remote storage service in recovery mode if eMMC booting
+#
+service rmt_storage /sbin/rmt_storage /dev/block/mmcblk0p13 /dev/block/mmcblk0p14
+    class core
+    user root
+    disabled
+
+service mfgsrv /sbin/mfgsrv -i -t /dev/ttyMSM0
+    class core
+    user root
+    group root
+    disabled
+
+on property:ro.emmc=1
+    start rmt_storage
+
+on property:ro.bootmode=power_test
+   write /sys/module/pm2/modes/cpu0/standalone_power_collapse/suspend_enabled 1
+   write /sys/module/pm2/modes/cpu1/standalone_power_collapse/suspend_enabled 1
+   write /sys/module/pm2/modes/cpu0/power_collapse/suspend_enabled 1
+
+on property:ro.mfgkernel=1
+    write /sys/power/wake_lock mfgkernel
+    devwait emmc@system
+    mount ext4 emmc@system /system ro barrier=1
+    insmod /system/lib/modules/texfat.ko
+    export PATH /sbin:/system/sbin:/system/bin:/system/xbin
+    export LD_LIBRARY_PATH /system/lib
+
+
+service post-boot /system/bin/sh /system/etc/init.post_boot.sh
+    user root
+    oneshot
+# HTC Camera - BEGIN
+chown media system /sys/camera_htccallback/htccallback
+# HTC Camera - END
+

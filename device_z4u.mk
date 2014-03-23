@@ -18,14 +18,24 @@ PRODUCT_COPY_FILES += \
     device/htc/z4u/configs/vold.fstab:system/etc/vold.fstab
 
 # Boot ramdisk setup
-PRODUCT_PACKAGES += \
-    fstab.qcom \
-    init.target.rc \
-    remount.qcom
+PRODUCT_COPY_FILES += \
+    device/htc/z4u/rootdir/bt_permission.sh:root/bt_permission.sh \
+    device/htc/z4u/rootdir/cwkeys:root/cwkeys \
+    device/htc/z4u/rootdir/fstab.z4u:root/fstab.z4u \
+    device/htc/z4u/rootdir/init.qcom.rc:root/init.qcom.rc \
+    device/htc/z4u/rootdir/init.qcom.sh:root/init.qcom.sh \
+    device/htc/z4u/rootdir/init.target.rc:root/init.target.rc \
+    device/htc/z4u/rootdir/init.target.recovery.rc:root/init.target.recovery.rc \
+    device/htc/z4u/rootdir/remount.qcom:root/remount.qcom \
+    device/htc/z4u/rootdir/sbin/gzip_recvy:root/sbin/gzip_recvy \
+    device/htc/z4u/rootdir/sbin/htc_ebdlogd_recvy:root/sbin/htc_ebdlogd_recvy \
+    device/htc/z4u/rootdir/sbin/logcat2_recvy:root/sbin/logcat2_recvy \
+    device/htc/z4u/rootdir/sbin/sfc:root/sbin/sfc \
+    device/htc/z4u/rootdir/ueventd.target.rc:root/ueventd.target.rc
 
 # Recovery
 PRODUCT_COPY_FILES += \
-    device/htc/z4u/rootdir/etc/fstab.qcom:recovery/root/fstab.qcom
+    device/htc/z4u/rootdir/fstab.z4u:recovery/root/fstab.z4u
 
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
 PRODUCT_NAME := full_z4u
