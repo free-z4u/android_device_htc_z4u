@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-     <project path="device/htc/z4u" name="0lvin/htc_z4u" revision="11.0" />
-     <project path="kernel/htc/z4u" name="0lvin/android_kernel_htc_z4u" revision="master" />
+	<project path="device/htc/z4u" name="0lvin/htc_z4u" revision="11.0" />
+	<project path="kernel/htc/z4u" name="dummie999/android_kernel_htc_z4u" revision="stock" />
 </manifest>
