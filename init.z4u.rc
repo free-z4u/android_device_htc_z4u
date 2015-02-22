@@ -1,0 +1,15 @@
+on early-init
+    mount debugfs debugfs /sys/kernel/debug
+
+on init
+    export EXTERNAL_STORAGE /storage/sdcard0
+
+on boot
+	# enable Google-specific location features,
+	# like NetworkLocationProvider and LocationCollector
+	setprop ro.com.google.locationfeatures 1
+
+on fs
+	mount_all /fstab.z4u
+
+
