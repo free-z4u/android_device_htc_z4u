@@ -54,3 +54,4 @@ ro.ril.disable.power.collapse = 1
 ro.ril.enable.sim.hot.swap = 1
 ro.ril.enable.prl.recognition = 1
 ro.telephony.ril_class=HTCQualcommRIL
+ro.kernel.qemu=1

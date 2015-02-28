@@ -11,7 +11,6 @@ etc/firmware/ath6k/AR6003/hw2.1.1/utf.bin
 etc/firmware/bahama.txt
 etc/firmware/yamato_pfp.fw
 etc/firmware/yamato_pm4.fw
-lib/egl/egl.cfg
 lib/egl/eglsubAndroid.so
 lib/egl/libEGL_adreno200.so
 lib/egl/libGLESv1_CM_adreno200.so
