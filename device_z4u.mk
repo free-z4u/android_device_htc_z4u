@@ -20,5 +20,6 @@ PRODUCT_DEVICE := z4u
 # Init files
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/fstab.z4u:root/fstab.z4u \
+    $(LOCAL_PATH)/ueventd.z4u.rc:root/ueventd.z4u.rc \
     $(LOCAL_PATH)/init.z4u.rc:root/init.z4u.rc
 

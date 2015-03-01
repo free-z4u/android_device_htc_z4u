@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
+	<remove-project name="CyanogenMod/android_system_core" />
 	<project path="device/htc/z4u" name="0lvin/htc_z4u" revision="11.0" />
 	<project path="kernel/htc/z4u" name="0lvin/android_kernel_htc_z4u" revision="cm-11.0" />
+	<project path="system/core" name="0lvin/android_system_core" revision="cm-11.0" />
 </manifest>
