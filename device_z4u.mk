@@ -21,5 +21,15 @@ PRODUCT_DEVICE := z4u
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/fstab.z4u:root/fstab.z4u \
     $(LOCAL_PATH)/ueventd.z4u.rc:root/ueventd.z4u.rc \
-    $(LOCAL_PATH)/init.z4u.rc:root/init.z4u.rc
+    $(LOCAL_PATH)/init.z4u.rc:root/init.z4u.rc \
+    $(LOCAL_PATH)/msmlogo.rle:root/msmlogo.rle \
+    $(LOCAL_PATH)/system/etc/firmware/ath6k/AR6003/hw2.1.1/athwlan.bin:system/etc/firmware/ath6k/AR6003/hw2.1.1/athwlan.bin \
+    $(LOCAL_PATH)/system/etc/firmware/ath6k/AR6003/hw2.1.1/bdata.SD31.bin:system/etc/firmware/ath6k/AR6003/hw2.1.1/bdata.SD31.bin \
+    $(LOCAL_PATH)/system/etc/firmware/ath6k/AR6003/hw2.1.1/bdata.SD32.bin:system/etc/firmware/ath6k/AR6003/hw2.1.1/bdata.SD32.bin \
+    $(LOCAL_PATH)/system/etc/firmware/ath6k/AR6003/hw2.1.1/bdata.WB31.bin:system/etc/firmware/ath6k/AR6003/hw2.1.1/bdata.WB31.bin \
+    $(LOCAL_PATH)/system/etc/firmware/ath6k/AR6003/hw2.1.1/data.patch.bin:system/etc/firmware/ath6k/AR6003/hw2.1.1/data.patch.bin \
+    $(LOCAL_PATH)/system/etc/firmware/ath6k/AR6003/hw2.1.1/endpointping.bin:system/etc/firmware/ath6k/AR6003/hw2.1.1/endpointping.bin \
+    $(LOCAL_PATH)/system/etc/firmware/ath6k/AR6003/hw2.1.1/fw-2.bin:system/etc/firmware/ath6k/AR6003/hw2.1.1/fw-2.bin \
+    $(LOCAL_PATH)/system/etc/firmware/ath6k/AR6003/hw2.1.1/fw-3.bin:system/etc/firmware/ath6k/AR6003/hw2.1.1/fw-3.bin \
+    $(LOCAL_PATH)/system/etc/firmware/ath6k/AR6003/hw2.1.1/otp.bin:system/etc/firmware/ath6k/AR6003/hw2.1.1/otp.bin
 
