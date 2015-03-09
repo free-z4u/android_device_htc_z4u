@@ -11,4 +11,6 @@
 /dev/block/platform/msm_sdcc.3/by-name/misc       /misc             emmc    defaults                                defaults
 /dev/block/platform/msm_sdcc.3/by-name/devlog     /devlog           ext4    defaults                                defaults
 
-/dev/block/mmcblk1p1                              /storage/sdcard0  vfat    defaults                                defaults
+/dev/block/mmcblk1p1                              auto              vfat    defaults                                voldmanaged=sdcard0:auto,noemulatedsd
+
+#/dev/block/zram0                                  none              swap    defaults                                zramsize=67108864

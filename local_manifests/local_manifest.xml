@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
+	<remote  name="kernel"
+		fetch="https://git.kernel.org" />
+
 	<remove-project name="CyanogenMod/android_system_core" />
 	<project path="device/htc/z4u" name="0lvin/htc_z4u" revision="11.0" />
 	<project path="kernel/htc/z4u" name="0lvin/android_kernel_htc_z4u" revision="cm-11.0" />
 	<project path="system/core" name="0lvin/android_system_core" revision="cm-11.0" />
 	<project path="hardware/atheros/wlan" name="Cyanogenmod/android_hardware_atheros_wlan" revision="cm-11.0" />
+	<project path="external/iw" name="pub/scm/linux/kernel/git/jberg/iw.git" remote="kernel" revision="master" />
 </manifest>
