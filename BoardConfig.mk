@@ -1,4 +1,5 @@
 USE_CAMERA_STUB := false
+BOARD_VENDOR := htc
 
 # Dalvik
 TARGET_ARCH_LOWMEM := true
@@ -8,7 +9,7 @@ TARGET_ARCH_LOWMEM := true
 
 TARGET_ARCH := arm
 TARGET_NO_BOOTLOADER := true
-TARGET_BOARD_PLATFORM := msm7x27a
+TARGET_BOARD_PLATFORM := msm8x26
 TARGET_BOARD_PLATFORM_GPU := qcom-adreno200
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
@@ -46,3 +47,15 @@ WIFI_DRIVER_MODULE_PATH := "/system/lib/modules/ath6kl_sdio.ko"
 WIFI_DRIVER_MODULE_NAME := "ath6kl_sdio"
 WIFI_DRIVER_MODULE_ARG := "suspend_mode=3 wow_mode=2 recovery_enable=1"
 WIFI_DRIVER_MODULE_AP_ARG := "suspend_mode=3 wow_mode=2 recovery_enable=1"
+
+# Flags
+COMMON_GLOBAL_CFLAGS += -DHTCLOG
+
+# QCOM hardware
+BOARD_USES_QCOM_HARDWARE := true
+TARGET_QCOM_AUDIO_VARIANT := caf
+TARGET_QCOM_DISPLAY_VARIANT := caf
+TARGET_QCOM_MEDIA_VARIANT := caf
+
+# Audio
+BOARD_USES_ALSA_AUDIO := true
