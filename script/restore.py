@@ -10,11 +10,13 @@ pattern = re.compile(
 
 pattern_white_space = re.compile(r'\s+')
 
+
 def removeCCppComment(text):
 
-    def replacer(match) :
+    def replacer(match):
         s = match.group(0)
-        # Matched string is //...EOL or /*...*/  ==> Blot out all non-newline chars
+        # Matched string is
+        # //...EOL or /*...*/  ==> Blot out all non-newline chars
         if s.startswith('/'):
             return ' '
         # Matched string is '...' or "..."  ==> Keep unchanged
@@ -22,6 +24,7 @@ def removeCCppComment(text):
             return s
 
     return re.sub(pattern, replacer, text)
+
 
 def get_hash(text, strip):
     cleaned_up_text = removeCCppComment(text)
@@ -35,12 +38,12 @@ def get_hash(text, strip):
         return cleaned_up_text
 
 
-def search_part_with_same_hash(full, hash):
-    stop = len(hash);
+def search_part_with_same_hash_head(text, hash):
+    stop = len(hash)
     # search start of magic
-    start_hash = get_hash(full[:stop], False)
+    start_hash = get_hash(text[:stop], False)
     while start_hash.strip() != hash:
-        if len(full) <= stop:
+        if len(text) <= stop:
             return None
         if len(hash) > len(start_hash):
             # try skip difference between hashes
@@ -48,10 +51,28 @@ def search_part_with_same_hash(full, hash):
         else:
             # looks like not hashable
             stop = stop + 1
-        start_hash = get_hash(full[:stop], False)
-    return full[:stop]
+        start_hash = get_hash(text[:stop], False)
+    return text[:stop]
 
-def optimize(src_file, dst_file):
+
+def search_part_with_same_hash_tail(text, hash):
+    stop = len(text) - len(hash)
+    # search start of magic
+    start_hash = removeCCppComment(text[stop:])
+    while start_hash.strip() != hash:
+        if stop <= 0:
+            return None
+        if len(hash) > len(start_hash):
+            # try skip difference between hashes
+            stop = stop - (len(hash) - len(start_hash))
+        else:
+            # looks like not hashable
+            stop = stop - 1
+        start_hash = removeCCppComment(text[stop:])
+    return text[stop:]
+
+
+def optimize_head(src_file, dst_file):
     src_desc = open(src_file, 'rb')
     with src_desc:
         src_text = src_desc.read()
@@ -64,34 +85,93 @@ def optimize(src_file, dst_file):
         return
     src_hash = get_hash(src_text, True)
     dst_hash = get_hash(dst_text, True)
-    common_hash = 0;
+    common_hash = None
     for i in range(min(len(src_hash), len(dst_hash))):
         if src_hash[i] != dst_hash[i]:
-           common_hash = src_hash[:i-1]
-           break
+            common_hash = src_hash[:i-1]
+            break
     if common_hash:
         common_hash = common_hash.strip()
     if common_hash:
-        print "diff %s => %s %d%%" % (src_file, dst_file, 100 * len(common_hash) / len(dst_hash))
-        common_hash_src = search_part_with_same_hash(src_text, common_hash)
+        print "diff %s => %s: common head=%d%%" % (
+            src_file, dst_file, 100 * len(common_hash) / len(dst_hash)
+        )
+        common_hash_src = search_part_with_same_hash_head(
+            src_text, common_hash
+        )
         if not common_hash_src:
             print "Check file please %s" % src_file
             sys.exit()
-        common_hash_dst = search_part_with_same_hash(dst_text, common_hash)
+        common_hash_dst = search_part_with_same_hash_head(
+            dst_text, common_hash
+        )
         if not common_hash_dst:
             print "Check file please %s" % dst_file
             sys.exit()
         if len(common_hash_dst) < len(common_hash_src):
-            src_desc = open(src_file, 'wb')
-            with(src_desc):
-                src_desc.write(common_hash_src + dst_text[len(common_hash_dst):])
+            dst_desc = open(dst_file, 'wb')
+            with(dst_desc):
+                dst_desc.write(
+                    common_hash_src + dst_text[len(common_hash_dst):]
+                )
     else:
-        print "diff %s => %s" % (src_file, dst_file)
+        print "diff %s => %s: no common head" % (src_file, dst_file)
+
+
+def optimize_tail(src_file, dst_file):
+    src_desc = open(src_file, 'rb')
+    with src_desc:
+        src_text = src_desc.read()
+    if not src_text:
+        return
+    dst_desc = open(dst_file, 'rb')
+    with dst_desc:
+        dst_text = dst_desc.read()
+    if not dst_text:
+        return
+    src_hash = removeCCppComment(src_text)
+    dst_hash = removeCCppComment(dst_text)
+    common_hash = None
+    for i in range(1, min(len(src_hash), len(dst_hash))):
+        if src_hash[-i] != dst_hash[-i]:
+            common_hash = src_hash[-i + 1:]
+            break
+    if common_hash:
+        if common_hash.index("\n") != -1:
+            common_hash = common_hash[common_hash.index("\n"):]
+    if common_hash:
+        common_hash = common_hash.strip()
+    if common_hash:
+        print "diff %s => %s: common tail %d%%" % (
+            src_file, dst_file, 100 * len(common_hash) / len(dst_hash)
+        )
+        common_hash_src = search_part_with_same_hash_tail(
+            src_text, common_hash
+        )
+        if not common_hash_src:
+            print "Check file please %s" % src_file
+            sys.exit()
+        common_hash_dst = search_part_with_same_hash_tail(
+            dst_text, common_hash
+        )
+        if not common_hash_dst:
+            print "Check file please %s" % dst_file
+            sys.exit()
+        if len(common_hash_dst) < len(common_hash_src):
+            dst_desc = open(dst_file, 'wb')
+            with(dst_desc):
+                dst_desc.write(
+                    dst_text[:-len(common_hash_dst)] + common_hash_src
+                )
+    else:
+        print "diff %s => %s: no comomn tail " % (src_file, dst_file)
+
 
 def file_hash(name):
     file_desc = open(name, 'rb')
     with file_desc:
         return get_hash(file_desc.read(), True)
+
 
 def process(to_dir, from_dir):
     for dirname, _, filenames in os.walk(from_dir):
@@ -110,7 +190,8 @@ def process(to_dir, from_dir):
                             shutil.copy2(src_file, dst_file)
                             print "copy %s => %s" % (src_file, dst_file)
                         else:
-                            optimize(src_file, dst_file)
+                            optimize_head(src_file, dst_file)
+                            optimize_tail(src_file, dst_file)
                     else:
                         print "same %s => %s" % (src_file, dst_file)
 
