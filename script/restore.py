@@ -49,9 +49,15 @@ def search_part_with_same_hash_head(text, hash):
             # try skip difference between hashes
             stop = stop + len(hash) - len(start_hash)
         else:
+            if text[stop] not in ("/", "\n", "*"):
+                for i in range(stop, len(text)):
+                    if text[i] in ("/", "\n", "*"):
+                        stop = i - 1
+                        break
             # looks like not hashable
             stop = stop + 1
         start_hash = get_hash(text[:stop], False)
+        print "%d%%   \r" % (100 * stop / len(text)),
     return text[:stop]
 
 
@@ -69,6 +75,7 @@ def search_part_with_same_hash_tail(text, hash):
             # looks like not hashable
             stop = stop - 1
         start_hash = removeCCppComment(text[stop:])
+        print "%d%%   \r" % (100 * stop / len(text)),
     return text[stop:]
 
 
@@ -197,27 +204,35 @@ def file_hash(name):
         return get_hash(file_desc.read(), True)
 
 
-def process(to_dir, from_dir):
-    for dirname, _, filenames in os.walk(from_dir):
-        # print path to all filenames.
-        for filename in filenames:
-            if filename.endswith('.c') or filename.endswith('.h'):
-                dst_file = os.path.join(dirname, filename)
-                src_file = dst_file.replace(from_dir, to_dir)
-                if os.access(src_file, os.R_OK):
-                    statinfo_origin = os.stat(src_file)
-                    statinfo_new = os.stat(dst_file)
-                    if statinfo_new.st_size < statinfo_origin.st_size:
-                        src_file_hash = file_hash(src_file)
-                        dst_file_hash = file_hash(dst_file)
-                        if dst_file_hash == src_file_hash:
-                            shutil.copy2(src_file, dst_file)
-                            print "copy %s => %s" % (src_file, dst_file)
-                        else:
-                            optimize_head(src_file, dst_file)
-                            optimize_tail(src_file, dst_file)
-                    else:
-                        print "same %s => %s" % (src_file, dst_file)
+def process_file(src_file, dst_file):
+    if os.access(src_file, os.R_OK) and os.access(dst_file, os.R_OK):
+        statinfo_origin = os.stat(src_file)
+        statinfo_new = os.stat(dst_file)
+        if statinfo_new.st_size < statinfo_origin.st_size:
+            src_file_hash = file_hash(src_file)
+            dst_file_hash = file_hash(dst_file)
+            if dst_file_hash == src_file_hash:
+                shutil.copy2(src_file, dst_file)
+                print "copy %s => %s" % (src_file, dst_file)
+            else:
+                optimize_head(src_file, dst_file)
+                optimize_tail(src_file, dst_file)
+        else:
+            print "same %s => %s" % (src_file, dst_file)
+
+
+def process(src_inode, dst_inode):
+    if os.path.isfile(dst_inode) and os.path.isfile(src_inode):
+        process_file(src_inode, dst_inode)
+    else:
+        for dirname, _, filenames in os.walk(src_inode):
+            # print path to all filenames.
+            for filename in filenames:
+                if filename.endswith('.c') or filename.endswith('.h'):
+                    src_file = os.path.join(dirname, filename)
+                    dst_file = src_file.replace(src_inode, dst_inode)
+                    process_file(src_file, dst_file)
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
