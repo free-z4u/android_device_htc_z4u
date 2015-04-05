@@ -92,30 +92,45 @@ def optimize_head(src_file, dst_file):
             break
     if common_hash:
         common_hash = common_hash.strip()
-    if common_hash:
-        print "diff %s => %s: common head=%d%%" % (
-            src_file, dst_file, 100 * len(common_hash) / len(dst_hash)
-        )
-        common_hash_src = search_part_with_same_hash_head(
-            src_text, common_hash
-        )
-        if not common_hash_src:
-            print "Check file please %s" % src_file
-            sys.exit()
-        common_hash_dst = search_part_with_same_hash_head(
-            dst_text, common_hash
-        )
-        if not common_hash_dst:
-            print "Check file please %s" % dst_file
-            sys.exit()
-        if len(common_hash_dst) < len(common_hash_src):
-            dst_desc = open(dst_file, 'wb')
-            with(dst_desc):
-                dst_desc.write(
-                    common_hash_src + dst_text[len(common_hash_dst):]
+    while True:
+        if common_hash:
+            print "diff %s => %s: common head %d%%" % (
+                src_file, dst_file, 100 * len(common_hash) / len(dst_hash)
+            )
+            common_hash_dst = None
+            common_hash_src = search_part_with_same_hash_head(
+                src_text, common_hash
+            )
+            if common_hash_src:
+                common_hash_dst = search_part_with_same_hash_head(
+                    dst_text, common_hash
                 )
-    else:
-        print "diff %s => %s: no common head" % (src_file, dst_file)
+            if common_hash_dst and common_hash_src:
+                if len(common_hash_dst) < len(common_hash_src):
+                    dst_desc = open(dst_file, 'wb')
+                    with(dst_desc):
+                        dst_desc.write(
+                            common_hash_src + dst_text[len(common_hash_dst):]
+                        )
+                return
+            # looks as too long hash
+            found_something = False
+            for i in range(1, len(common_hash)):
+                if common_hash[-i] == "\n":
+                    common_hash = common_hash[:-i].strip()
+                    found_something = True
+                    break
+            if not found_something:
+                print "diff %s => %s: No common head" % (
+                    src_file, dst_file
+                )
+                return
+            print "diff %s => %s: try shorter common head %d%%" % (
+                src_file, dst_file, 100 * len(common_hash) / len(dst_hash)
+            )
+        else:
+            print "diff %s => %s: no common head" % (src_file, dst_file)
+            return
 
 
 def optimize_tail(src_file, dst_file):
@@ -136,35 +151,44 @@ def optimize_tail(src_file, dst_file):
         if src_hash[-i] != dst_hash[-i]:
             common_hash = src_hash[-i + 1:]
             break
-    if common_hash:
-        if common_hash.index("\n") != -1:
-            common_hash = common_hash[common_hash.index("\n"):]
-    if common_hash:
-        common_hash = common_hash.strip()
-    if common_hash:
-        print "diff %s => %s: common tail %d%%" % (
-            src_file, dst_file, 100 * len(common_hash) / len(dst_hash)
-        )
-        common_hash_src = search_part_with_same_hash_tail(
-            src_text, common_hash
-        )
-        if not common_hash_src:
-            print "Check file please %s" % src_file
-            sys.exit()
-        common_hash_dst = search_part_with_same_hash_tail(
-            dst_text, common_hash
-        )
-        if not common_hash_dst:
-            print "Check file please %s" % dst_file
-            sys.exit()
-        if len(common_hash_dst) < len(common_hash_src):
-            dst_desc = open(dst_file, 'wb')
-            with(dst_desc):
-                dst_desc.write(
-                    dst_text[:-len(common_hash_dst)] + common_hash_src
+    while True:
+        found_something = False
+        if common_hash:
+            if common_hash.index("\n") != -1:
+                found_something = True
+                common_hash = common_hash[common_hash.index("\n"):].strip()
+        if common_hash:
+            print "diff %s => %s: common tail %d%%" % (
+                src_file, dst_file, 100 * len(common_hash) / len(dst_hash)
+            )
+            common_hash_dst = None
+            common_hash_src = search_part_with_same_hash_tail(
+                src_text, common_hash
+            )
+            if common_hash_src:
+                common_hash_dst = search_part_with_same_hash_tail(
+                    dst_text, common_hash
                 )
-    else:
-        print "diff %s => %s: no comomn tail " % (src_file, dst_file)
+            if common_hash_dst and common_hash_src:
+                if len(common_hash_dst) < len(common_hash_src):
+                    dst_desc = open(dst_file, 'wb')
+                    with(dst_desc):
+                        dst_desc.write(
+                            dst_text[:-len(common_hash_dst)] + common_hash_src
+                        )
+                return
+            if not found_something:
+                print "diff %s => %s: No common tail" % (
+                    src_file, dst_file
+                )
+                return
+            # looks as too long hash
+            print "diff %s => %s: try shorter common tail %d%%" % (
+                src_file, dst_file, 100 * len(common_hash) / len(dst_hash)
+            )
+        else:
+            print "diff %s => %s: no comomn tail " % (src_file, dst_file)
+            return
 
 
 def file_hash(name):
@@ -185,8 +209,8 @@ def process(to_dir, from_dir):
                     statinfo_new = os.stat(dst_file)
                     if statinfo_new.st_size < statinfo_origin.st_size:
                         src_file_hash = file_hash(src_file)
-                        new_file_hash = file_hash(dst_file)
-                        if new_file_hash == src_file_hash:
+                        dst_file_hash = file_hash(dst_file)
+                        if dst_file_hash == src_file_hash:
                             shutil.copy2(src_file, dst_file)
                             print "copy %s => %s" % (src_file, dst_file)
                         else:
