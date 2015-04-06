@@ -169,9 +169,9 @@ def optimize_tail(src_file, dst_file):
     while True:
         found_something = False
         if common_hash:
-            if common_hash.index("\n") != -1:
+            if common_hash.find("\n") != -1:
                 found_something = True
-                common_hash = common_hash[common_hash.index("\n"):].strip()
+                common_hash = common_hash[common_hash.find("\n"):].strip()
         if common_hash:
             print "diff %s => %s: common tail %d%%" % (
                 src_file, dst_file, 100 * len(common_hash) / len(dst_hash)
