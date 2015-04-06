@@ -41,10 +41,11 @@ def get_hash(text, strip):
 def search_part_with_same_hash_head(text, hash):
     stop = len(hash)
     # search start of magic
-    start_hash = get_hash(text[:stop], False)
-    while start_hash.strip() != hash:
+    start_hash = get_hash(text[:stop], False).strip()
+    while start_hash != hash:
         if len(text) <= stop:
             return None
+        last_stop = stop
         if len(hash) > len(start_hash):
             # try skip difference between hashes
             stop = stop + len(hash) - len(start_hash)
@@ -56,7 +57,11 @@ def search_part_with_same_hash_head(text, hash):
                         break
             # looks like not hashable
             stop = stop + 1
-        start_hash = get_hash(text[:stop], False)
+        start_hash = get_hash(text[:stop], False).strip()
+        if start_hash[:len(hash)] == hash:
+            # slowdown search
+            stop = last_stop + 1
+            start_hash = get_hash(text[:stop], False).strip()
         print "%d%%   \r" % (100 * stop / len(text)),
     return text[:stop]
 
