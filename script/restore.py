@@ -38,12 +38,13 @@ def get_hash(text, strip):
         return cleaned_up_text
 
 
-def search_part_with_same_hash_head(text, hash):
+def search_part_with_same_hash_head(text, hash, diff_len):
     stop = len(hash)
     # search start of magic
     start_hash = get_hash(text[:stop], False).strip()
+    full_len = len(text) - diff_len
     while start_hash != hash:
-        if len(text) <= stop:
+        if full_len <= stop:
             return None
         last_stop = stop
         if len(hash) > len(start_hash):
@@ -51,7 +52,7 @@ def search_part_with_same_hash_head(text, hash):
             stop = stop + len(hash) - len(start_hash)
         else:
             if text[stop] not in ("/", "\n", "*"):
-                for i in range(stop, len(text)):
+                for i in xrange(stop, len(text)):
                     if text[i] in ("/", "\n", "*"):
                         stop = i - 1
                         break
@@ -66,12 +67,12 @@ def search_part_with_same_hash_head(text, hash):
     return text[:stop]
 
 
-def search_part_with_same_hash_tail(text, hash):
+def search_part_with_same_hash_tail(text, hash, diff_len):
     stop = len(text) - len(hash)
     # search start of magic
     start_hash = removeCCppComment(text[stop:])
     while start_hash.strip() != hash:
-        if stop <= 0:
+        if stop <= diff_len:
             return None
         if len(hash) > len(start_hash):
             # try skip difference between hashes
@@ -98,7 +99,7 @@ def optimize_head(src_file, dst_file):
     src_hash = get_hash(src_text, True)
     dst_hash = get_hash(dst_text, True)
     common_hash = None
-    for i in range(min(len(src_hash), len(dst_hash))):
+    for i in xrange(min(len(src_hash), len(dst_hash))):
         if src_hash[i] != dst_hash[i]:
             common_hash = src_hash[:i-1]
             break
@@ -111,11 +112,13 @@ def optimize_head(src_file, dst_file):
             )
             common_hash_dst = None
             common_hash_src = search_part_with_same_hash_head(
-                src_text, common_hash
+                src_text, common_hash,
+                len(src_hash) - len(common_hash)
             )
             if common_hash_src:
                 common_hash_dst = search_part_with_same_hash_head(
-                    dst_text, common_hash
+                    dst_text, common_hash,
+                    len(dst_hash) - len(common_hash)
                 )
             if common_hash_dst and common_hash_src:
                 if len(common_hash_dst) < len(common_hash_src):
@@ -127,7 +130,7 @@ def optimize_head(src_file, dst_file):
                 return
             # looks as too long hash
             found_something = False
-            for i in range(1, len(common_hash)):
+            for i in xrange(1, len(common_hash)):
                 if common_hash[-i] == "\n":
                     common_hash = common_hash[:-i].strip()
                     found_something = True
@@ -159,7 +162,7 @@ def optimize_tail(src_file, dst_file):
     src_hash = removeCCppComment(src_text)
     dst_hash = removeCCppComment(dst_text)
     common_hash = None
-    for i in range(1, min(len(src_hash), len(dst_hash))):
+    for i in xrange(1, min(len(src_hash), len(dst_hash))):
         if src_hash[-i] != dst_hash[-i]:
             common_hash = src_hash[-i + 1:]
             break
@@ -175,11 +178,13 @@ def optimize_tail(src_file, dst_file):
             )
             common_hash_dst = None
             common_hash_src = search_part_with_same_hash_tail(
-                src_text, common_hash
+                src_text, common_hash,
+                len(src_hash) - len(common_hash)
             )
             if common_hash_src:
                 common_hash_dst = search_part_with_same_hash_tail(
-                    dst_text, common_hash
+                    dst_text, common_hash,
+                    len(dst_hash) - len(common_hash)
                 )
             if common_hash_dst and common_hash_src:
                 if len(common_hash_dst) < len(common_hash_src):
