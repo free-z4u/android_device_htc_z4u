@@ -223,19 +223,19 @@ def file_hash(name):
 
 def process_file(src_file, dst_file):
     if os.access(src_file, os.R_OK) and os.access(dst_file, os.R_OK):
-        statinfo_origin = os.stat(src_file)
-        statinfo_new = os.stat(dst_file)
-        if statinfo_new.st_size < statinfo_origin.st_size:
-            src_file_hash = file_hash(src_file)
-            dst_file_hash = file_hash(dst_file)
-            if dst_file_hash == src_file_hash:
+        src_file_hash = file_hash(src_file)
+        dst_file_hash = file_hash(dst_file)
+        if dst_file_hash == src_file_hash:
+            statinfo_src = os.stat(src_file)
+            statinfo_dst = os.stat(dst_file)
+            if statinfo_dst.st_size < statinfo_src.st_size:
                 shutil.copy2(src_file, dst_file)
                 print "copy %s => %s" % (src_file, dst_file)
             else:
-                optimize_head(src_file, dst_file)
-                optimize_tail(src_file, dst_file)
+                print "same %s => %s" % (src_file, dst_file)
         else:
-            print "same %s => %s" % (src_file, dst_file)
+            optimize_head(src_file, dst_file)
+            optimize_tail(src_file, dst_file)
 
 
 def process(src_inode, dst_inode):
