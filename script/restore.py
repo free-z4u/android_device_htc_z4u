@@ -70,7 +70,7 @@ def search_part_with_same_hash_head(text, hash, diff_len):
 def search_part_with_same_hash_tail(text, hash, diff_len):
     stop = len(text) - len(hash)
     # search start of magic
-    start_hash = removeCCppComment(text[stop:])
+    start_hash = get_hash(text[stop:], False)
     while start_hash.strip() != hash:
         if stop <= diff_len:
             return None
@@ -80,7 +80,7 @@ def search_part_with_same_hash_tail(text, hash, diff_len):
         else:
             # looks like not hashable
             stop = stop - 1
-        start_hash = removeCCppComment(text[stop:])
+        start_hash = get_hash(text[stop:], False)
         print "%d%%   \r" % (100 * stop / len(text)),
     return text[stop:]
 
@@ -116,10 +116,13 @@ def optimize_head(src_file, dst_file):
                 len(src_hash) - len(common_hash)
             )
             if common_hash_src:
-                common_hash_dst = search_part_with_same_hash_head(
-                    dst_text, common_hash,
-                    len(dst_hash) - len(common_hash)
-                )
+                if dst_text[:len(common_hash_src)] == common_hash_src:
+                    common_hash_dst = common_hash_src
+                else:
+                    common_hash_dst = search_part_with_same_hash_head(
+                        dst_text, common_hash,
+                        len(dst_hash) - len(common_hash)
+                    )
             if common_hash_dst and common_hash_src:
                 if len(common_hash_dst) < len(common_hash_src):
                     dst_desc = open(dst_file, 'wb')
@@ -159,12 +162,13 @@ def optimize_tail(src_file, dst_file):
         dst_text = dst_desc.read()
     if not dst_text:
         return
-    src_hash = removeCCppComment(src_text)
-    dst_hash = removeCCppComment(dst_text)
+    src_hash = get_hash(src_text, True)
+    dst_hash = get_hash(dst_text, True)
     common_hash = None
     for i in xrange(1, min(len(src_hash), len(dst_hash))):
         if src_hash[-i] != dst_hash[-i]:
-            common_hash = src_hash[-i + 1:]
+            if i > 1:
+                common_hash = src_hash[-i + 1:]
             break
     while True:
         found_something = False
@@ -182,10 +186,13 @@ def optimize_tail(src_file, dst_file):
                 len(src_hash) - len(common_hash)
             )
             if common_hash_src:
-                common_hash_dst = search_part_with_same_hash_tail(
-                    dst_text, common_hash,
-                    len(dst_hash) - len(common_hash)
-                )
+                if dst_text[:-len(common_hash_src)] == common_hash_src:
+                    common_hash_dst = common_hash_src
+                else:
+                    common_hash_dst = search_part_with_same_hash_tail(
+                        dst_text, common_hash,
+                        len(dst_hash) - len(common_hash)
+                    )
             if common_hash_dst and common_hash_src:
                 if len(common_hash_dst) < len(common_hash_src):
                     dst_desc = open(dst_file, 'wb')
