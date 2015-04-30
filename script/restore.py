@@ -1,47 +1,13 @@
-import re
 import os
 import shutil
 import sys
-
-pattern = re.compile(
-    r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
-    re.DOTALL | re.MULTILINE
-)
-
-pattern_white_space = re.compile(r'\s+')
-
-
-def removeCCppComment(text):
-
-    def replacer(match):
-        s = match.group(0)
-        # Matched string is
-        # //...EOL or /*...*/  ==> Blot out all non-newline chars
-        if s.startswith('/'):
-            return ' '
-        # Matched string is '...' or "..."  ==> Keep unchanged
-        else:
-            return s
-
-    return re.sub(pattern, replacer, text)
-
-
-def get_hash(text, strip):
-    cleaned_up_text = removeCCppComment(text)
-    # drop whitespaces
-    cleaned_up_text = re.sub(pattern_white_space, '\n', cleaned_up_text)
-    if strip:
-        # for compare case
-        return cleaned_up_text.strip()
-    else:
-        # for search patern case
-        return cleaned_up_text
+import utils_clean
 
 
 def search_part_with_same_hash_head(text, hash, diff_len):
     stop = len(hash)
     # search start of magic
-    start_hash = get_hash(text[:stop], False).strip()
+    start_hash = utils_clean.get_hash(text[:stop], False).strip()
     full_len = len(text) - diff_len
     while start_hash != hash:
         if full_len <= stop:
@@ -58,11 +24,11 @@ def search_part_with_same_hash_head(text, hash, diff_len):
                         break
             # looks like not hashable
             stop = stop + 1
-        start_hash = get_hash(text[:stop], False).strip()
+        start_hash = utils_clean.get_hash(text[:stop], False).strip()
         if start_hash[:len(hash)] == hash:
             # slowdown search
             stop = last_stop + 1
-            start_hash = get_hash(text[:stop], False).strip()
+            start_hash = utils_clean.get_hash(text[:stop], False).strip()
         print "%d%%   \r" % (100 * stop / len(text)),
     return text[:stop]
 
@@ -70,7 +36,7 @@ def search_part_with_same_hash_head(text, hash, diff_len):
 def search_part_with_same_hash_tail(text, hash, diff_len):
     stop = len(text) - len(hash)
     # search start of magic
-    start_hash = get_hash(text[stop:], False)
+    start_hash = utils_clean.get_hash(text[stop:], False)
     while start_hash.strip() != hash:
         if stop <= diff_len:
             return None
@@ -80,7 +46,7 @@ def search_part_with_same_hash_tail(text, hash, diff_len):
         else:
             # looks like not hashable
             stop = stop - 1
-        start_hash = get_hash(text[stop:], False)
+        start_hash = utils_clean.get_hash(text[stop:], False)
         print "%d%%   \r" % (100 * stop / len(text)),
     return text[stop:]
 
@@ -88,16 +54,16 @@ def search_part_with_same_hash_tail(text, hash, diff_len):
 def optimize_head(src_file, dst_file):
     src_desc = open(src_file, 'rb')
     with src_desc:
-        src_text = src_desc.read()
+        src_text = utils_clean.cleanup(src_desc.read())
     if not src_text:
         return
     dst_desc = open(dst_file, 'rb')
     with dst_desc:
-        dst_text = dst_desc.read()
+        dst_text = utils_clean.cleanup(dst_desc.read())
     if not dst_text:
         return
-    src_hash = get_hash(src_text, True)
-    dst_hash = get_hash(dst_text, True)
+    src_hash = utils_clean.get_hash(src_text, True)
+    dst_hash = utils_clean.get_hash(dst_text, True)
     common_hash = None
     for i in xrange(min(len(src_hash), len(dst_hash))):
         if src_hash[i] != dst_hash[i]:
@@ -154,16 +120,16 @@ def optimize_head(src_file, dst_file):
 def optimize_tail(src_file, dst_file):
     src_desc = open(src_file, 'rb')
     with src_desc:
-        src_text = src_desc.read()
+        src_text = utils_clean.cleanup(src_desc.read())
     if not src_text:
         return
     dst_desc = open(dst_file, 'rb')
     with dst_desc:
-        dst_text = dst_desc.read()
+        dst_text = utils_clean.cleanup(dst_desc.read())
     if not dst_text:
         return
-    src_hash = get_hash(src_text, True)
-    dst_hash = get_hash(dst_text, True)
+    src_hash = utils_clean.get_hash(src_text, True)
+    dst_hash = utils_clean.get_hash(dst_text, True)
     common_hash = None
     for i in xrange(1, min(len(src_hash), len(dst_hash))):
         if src_hash[-i] != dst_hash[-i]:
@@ -218,7 +184,7 @@ def optimize_tail(src_file, dst_file):
 def file_hash(name):
     file_desc = open(name, 'rb')
     with file_desc:
-        return get_hash(file_desc.read(), True)
+        return utils_clean.get_hash(file_desc.read(), True)
 
 
 def process_file(src_file, dst_file):
