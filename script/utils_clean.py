@@ -41,7 +41,7 @@ def replace_space_at_start(text):
     splited = text.split("\n")
     for i in xrange(len(splited)):
         pos = 0
-        while pos < len(splited[i]) and splited[i] == ' ':
+        while pos < len(splited[i]) and splited[i][pos] == ' ':
             pos = pos + 1
         if pos > 0:
             tabs = int(pos/8)

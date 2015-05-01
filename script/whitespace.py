@@ -26,12 +26,18 @@ def process(src_inode):
         for dirname, _, filenames in os.walk(src_inode):
             # print path to all filenames.
             for filename in filenames:
-                if filename.endswith('.c') or filename.endswith('.h'):
+                if filename.endswith('.c') or \
+                   filename.endswith('.h') or \
+                   filename.endswith('Kconfig') or \
+                   filename == 'Kconfig':
                     src_file = os.path.join(dirname, filename)
                     process_file(src_file)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "usage: python whitespace.py android_kernel_htc_z4u"
+        print """
+            usage: python whitespace.py android_kernel_htc_z4u
+            little optimize whitespaces
+        """
     else:
         process(sys.argv[1])
