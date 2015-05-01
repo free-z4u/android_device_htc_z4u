@@ -43,8 +43,9 @@ def replace_space_at_start(text):
         pos = 0
         while pos < len(splited[i]) and splited[i] == ' ':
             pos = pos + 1
-        tabs = int(pos/8)
-        splited[i] = ("\t" * tabs) + splited[i][tabs * 8:]
+        if pos > 0:
+            tabs = int(pos/8)
+            splited[i] = ("\t" * tabs) + splited[i][tabs * 8:]
     return "\n".join(splited)
 
 

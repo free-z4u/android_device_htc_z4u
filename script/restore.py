@@ -1,5 +1,4 @@
 import os
-import shutil
 import sys
 import utils_clean
 
@@ -187,6 +186,28 @@ def file_hash(name):
         return utils_clean.get_hash(file_desc.read(), True)
 
 
+def process_copy(src_file, dst_file):
+    src_desc = open(src_file, 'rb')
+    with src_desc:
+        src_text = src_desc.read()
+    if not src_text:
+        return
+    dst_desc = open(dst_file, 'rb')
+    with dst_desc:
+        dst_text = utils_clean.cleanup(dst_desc.read())
+    if not dst_text:
+        return
+    src_text = utils_clean.cleanup(src_text)
+    dst_text = utils_clean.cleanup(dst_text)
+    if len(dst_text) < len(src_text):
+        dst_desc = open(dst_file, 'wb')
+        with(dst_desc):
+            dst_desc.write(src_text)
+        print "update done: %s => %s" % (src_file, dst_file)
+    else:
+        print "update unnecessary: %s => %s" % (src_file, dst_file)
+
+
 def process_file(src_file, dst_file):
     if os.access(src_file, os.R_OK) and os.access(dst_file, os.R_OK):
         src_file_hash = file_hash(src_file)
@@ -195,8 +216,7 @@ def process_file(src_file, dst_file):
             statinfo_src = os.stat(src_file)
             statinfo_dst = os.stat(dst_file)
             if statinfo_dst.st_size < statinfo_src.st_size:
-                shutil.copy2(src_file, dst_file)
-                print "copy %s => %s" % (src_file, dst_file)
+                process_copy(src_file, dst_file)
             else:
                 print "same %s => %s" % (src_file, dst_file)
         else:

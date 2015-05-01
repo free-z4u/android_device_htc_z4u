@@ -16,7 +16,7 @@ def process_file(src_file):
             dst_desc.write(dst_text)
         print "update: " + src_file
     else:
-        print "update: " + src_file
+        print "update unnecessary: " + src_file
 
 
 def process(src_inode):
