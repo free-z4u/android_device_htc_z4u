@@ -35,7 +35,9 @@ def process_file(src_file, dst_file):
             dst_file_hash = utils_fuzzy_logic.file_hash(dst_file)
             if dst_file_hash == src_file_hash:
                 need_copy = True
-        elif src_file.endswith('Kconfig'):
+        elif src_file.endswith('Kconfig') or \
+                src_file.endswith('.s') or \
+                src_file.endswith('.S'):
             src_file_hash = utils_clean.cleanup(src_file)
             dst_file_hash = utils_clean.cleanup(dst_file)
             if dst_file_hash == src_file_hash:
@@ -56,6 +58,8 @@ def process(src_inode, dst_inode):
             for filename in filenames:
                 if filename.endswith('.c') or \
                    filename.endswith('.h') or \
+                   filename.endswith('.s') or \
+                   filename.endswith('.S') or \
                    filename.endswith('Kconfig') or \
                    filename == 'Kconfig':
                     src_file = os.path.join(dirname, filename)

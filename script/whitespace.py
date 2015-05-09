@@ -28,6 +28,8 @@ def process(src_inode):
             for filename in filenames:
                 if filename.endswith('.c') or \
                    filename.endswith('.h') or \
+                   filename.endswith('.s') or \
+                   filename.endswith('.S') or \
                    filename.endswith('Kconfig') or \
                    filename == 'Kconfig':
                     src_file = os.path.join(dirname, filename)
