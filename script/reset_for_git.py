@@ -15,8 +15,6 @@ def process_copy(src_file, dst_file):
         dst_text = dst_desc.read()
     if not dst_text:
         return
-    src_text = utils_clean.cleanup(src_text)
-    dst_text = utils_clean.cleanup(dst_text)
     if dst_text != src_text:
         dst_desc = open(dst_file, 'wb')
         with(dst_desc):
