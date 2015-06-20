@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-     <project path="device/htc/z4u" name="0lvin/htc_z4u" revision="10.1" />
-     <project path="kernel/htc/z4u" name="0lvin/android_kernel_htc_z4u" revision="master" />
+	<remote  name="kernel"
+		fetch="https://git.kernel.org" />
+
+	<remove-project name="CyanogenMod/android_system_core" />
+	<project path="device/htc/z4u" name="free-z4u/android_device_htc_z4u" revision="cm-10.2" />
+	<project path="kernel/htc/z4u" name="free-z4u/android_kernel_htc_z4u" revision="cm-10.1" />
+	<project path="system/core" name="free-z4u/android_system_core" revision="cm-10.2" />
 </manifest>
